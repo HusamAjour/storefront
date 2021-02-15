@@ -1,4 +1,6 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { add, remove, reset } from '../store/cart.js';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -17,6 +19,7 @@ const useStyles = makeStyles({
 
 function ProductCard(props) {
   const classes = useStyles();
+  let productName = props.productName;
   return (
     <Card>
       {/* <CardMedia
@@ -39,7 +42,13 @@ function ProductCard(props) {
             </Typography> */}
       </CardContent>
       <CardActions>
-        <Button size="small" color="primary">
+        <Button
+          size="small"
+          color="primary"
+          onClick={() => {
+            return props.add(productName);
+          }}
+        >
           ADD TO CART
         </Button>
         <Button size="small" color="primary">
@@ -50,4 +59,10 @@ function ProductCard(props) {
   );
 }
 
-export default ProductCard;
+const mapStateToProps = (state) => ({
+  cartItems: state.cart,
+});
+
+const mapDispatchToProps = { add, remove, reset };
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProductCard);
