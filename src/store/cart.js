@@ -6,17 +6,23 @@ let initialState = {
 // eslint-disable-next-line import/no-anonymous-default-export
 export default (state = initialState, action) => {
   let { type, payload } = action;
-  let items = state.items;
-  let totalCount = state.total;
+  let getCartItems
+  let totalCount
+  console.log('Inide Cart reducer');
+
   switch (type) {
     case 'ADD':
+      getCartItems = state.items;
+      totalCount = state.total;
+      console.log('payload add to cart reducer', payload);
+      console.log('Inide add to Cart reducer');
       if (!state.items) {
-        items.push({ name: payload, quantity: 1 });
-        items++;
-        return { ...state, items, total: totalCount };
+        getCartItems.push({ product: payload, quantity: 1 });
+        totalCount++;
+        return { ...state, items: getCartItems, total: totalCount };
       }
-      let cartItem = items.reduce((cumm, item) => {
-        if (item.name === payload) {
+      let cartItem = getCartItems.reduce((cumm, item) => {
+        if (item.product.name === payload.name) {
           item.quantity++;
           totalCount++;
           cumm = true;
@@ -25,15 +31,20 @@ export default (state = initialState, action) => {
         return cumm;
       }, false);
       if (!cartItem) {
-        items.push({ name: payload, quantity: 1 });
+        getCartItems.push({ product: payload, quantity: 1 });
         totalCount++;
       }
-      return { ...state, items, total: totalCount };
+      console.log('state before send', { ...getCartItems, items: cartItem, total: totalCount });
+      return { ...state, items: getCartItems, total: totalCount };
 
     case 'REMOVE':
-      let total = state.total - 1;
-      let cartItems = state.items.reduce((cumm, item) => {
-        if (item.name === payload) {
+      getCartItems = state.items;
+      totalCount = state.total;
+      console.log('payload iniside cart', payload)
+      totalCount = totalCount - 1;
+      let cartItems = getCartItems.reduce((cumm, item) => {
+        console.log('reduce count by 1',item.product);
+        if (item.product.name === payload.name) {
           item.quantity--;
           if (item.quantity > 0) {
             cumm.push(item);
@@ -43,7 +54,7 @@ export default (state = initialState, action) => {
         cumm.push(item);
         return cumm;
       }, []);
-      return { ...state, items: cartItems, total};
+      return { ...getCartItems, items: cartItems, total: totalCount};
 
     case 'RESET':
       state = initialState;
@@ -54,23 +65,23 @@ export default (state = initialState, action) => {
   }
 };
 
-export const add = (item) => {
-  return {
-    type: 'ADD',
-    payload: item,
-  };
-};
+// export const add = (item) => {
+//   return {
+//     type: 'ADD',
+//     payload: item,
+//   };
+// };
 
-export const remove = (item) => {
-  return {
-    type: 'REMOVE',
-    payload: item,
-  };
-};
+// export const remove = (item) => {
+//   return {
+//     type: 'REMOVE',
+//     payload: item,
+//   };
+// };
 
-export const reset = () => {
-  return {
-    type: 'RESET',
-    payload: '',
-  };
-};
+// export const reset = () => {
+//   return {
+//     type: 'RESET',
+//     payload: '',
+//   };
+// };

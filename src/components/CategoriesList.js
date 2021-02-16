@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { category } from '../store/data.js';
-import { add, remove, reset } from '../store/cart.js';
+// import { add, remove, reset } from '../store/cart.js';
 import ProductCard from './ProductCard';
 import Show from './Show';
+import * as actions from '../store/actions';
+
 import {
   Grid,
   Container,
@@ -44,7 +45,19 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function CategoriesList(props) {
+  const fetchData = async () => {
+    document.title = document.title;
+    await props.get();
+  };
+
   const classes = useStyles();
+  useEffect(() => {
+    fetchData();
+  }, ['']);
+
+  // useEffect(() => {
+  //   setValue(props);
+  // }, [value]);
   return (
     <Container maxWidth={'lg'}>
       <div className={classes.root}>
@@ -56,16 +69,16 @@ function CategoriesList(props) {
         >
           Browse our Categories{' '}
         </Typography>
-
+        {console.log('after getting data:====> ', props.dataProps)}
         <List className={classes.flexList}>
           {props.dataProps.categories.map((category, i) => {
             return (
               <>
                 <ListItemText
                   className={classes.listItem}
-                  primary={category.displayName}
-                  key={i * 5003}
-                  onClick={() => props.category(category.name)}
+                  primary={category.display_name}
+                  key={category._id}
+                  onClick={() => props.changeActiveCategory(category.name)}
                 />
                 <Show condition={i !== props.dataProps.categories.length - 1}>
                   <Divider
@@ -88,7 +101,7 @@ function CategoriesList(props) {
                 variant="h2"
                 component="h1"
               >
-                {category.displayName}
+                {category.display_name}
               </Typography>
             );
           }
@@ -99,10 +112,13 @@ function CategoriesList(props) {
           {props.dataProps.products.map((product, i) => {
             if (product.category === props.dataProps.activeCategory) {
               return (
-                <Grid item xs={4} key={i * 32}>
+                <Grid item xs={4} key={product._id}>
                   <ProductCard
                     className={classes.textAlignLeft}
-                    productName={product.name}
+                    wholeProduct={product}
+                    productName={product.display_name}
+                    inStock={product.inStock}
+                    price={product.price}
                   />
                 </Grid>
               );
@@ -120,6 +136,11 @@ const mapStateToProps = (state) => ({
   cartItems: state.cart,
 });
 
-const mapDispatchToProps = { category, add, remove, reset };
+const mapDispatchToProps = (dispatch, getState) => ({
+  get: () => dispatch(actions.getRemoteData()),
+  changeActiveCategory: (name) => dispatch(actions.changeActiveCategory(name))
+});
+
+// const mapDispatchToProps = { category, add, remove, reset };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CategoriesList);

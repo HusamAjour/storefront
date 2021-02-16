@@ -1,10 +1,11 @@
 import React from 'react';
 import Show from './Show';
+import * as actions from '../store/actions';
 import { Dropdown } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import { Badge, Button, ButtonGroup } from '@material-ui/core';
-import { add, remove, reset } from '../store/cart.js';
+// import { add, remove, reset } from '../store/cart.js';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -18,8 +19,8 @@ const useStyles = makeStyles({
   btn: {
     padding: '0',
   },
-  btnGroup:{
-      marginLeft: "25px"
+  btnGroup: {
+    marginLeft: '25px',
   },
   root: {
     width: '100%',
@@ -32,24 +33,25 @@ function Cart(props) {
     <div>
       <Dropdown>
         <Dropdown.Toggle variant="Primary" id="dropdown-basic">
-        <Badge badgeContent={props.cartItems.total} color="error">
-
-          <ShoppingCartIcon />
+          <Badge badgeContent={props.cartItems.total} color="error">
+            <ShoppingCartIcon />
           </Badge>
         </Dropdown.Toggle>
         <Dropdown.Menu>
+          {console.log('inside cart component======>', props.cartItems.items)}
           {props.cartItems.items.map((item, idx) => {
             return (
               <Dropdown.ItemText className={classes.dropdownItem}>
                 <Badge badgeContent={item.quantity} color="primary">
-                  {item.name}
+                  {item.product.display_name}
                 </Badge>
                 <ButtonGroup className={classes.btnGroup}>
                   <Button
                     className={classes.btn}
                     aria-label="reduce"
-                    onClick={() => {
-                      props.remove(item.name);
+                    onClick={async () => {
+                      // props.remove(item.product);
+                      await props.update('REMOVE',item.product);
                     }}
                   >
                     <RemoveIcon fontSize="small" />
@@ -57,8 +59,9 @@ function Cart(props) {
                   <Button
                     className={classes.btn}
                     aria-label="increase"
-                    onClick={() => {
-                      props.add(item.name);
+                    onClick={async() => {
+                      // props.add(item.name);
+                      await props.update('ADD', item.product);
                     }}
                   >
                     <AddIcon fontSize="small" />
@@ -67,13 +70,13 @@ function Cart(props) {
               </Dropdown.ItemText>
             );
           })}
-          <Dropdown.Item
+          {/* <Dropdown.Item
             onClick={() => {
               props.reset();
             }}
           >
             Reset <RotateLeftIcon />
-          </Dropdown.Item>
+          </Dropdown.Item> */}
         </Dropdown.Menu>
       </Dropdown>
     </div>
@@ -82,8 +85,14 @@ function Cart(props) {
 
 const mapStateToProps = (state) => ({
   cartItems: state.cart,
+  dataProps: state.data,
 });
 
-const mapDispatchToProps = { add, remove, reset };
+const mapDispatchToProps = (dispatch, getState) => ({
+  // add: (item)=> dispatch(actions.add(item)),
+  // remove: (item)=> dispatch(actions.remove(item)),
+  update: (actionType, item) => dispatch(actions.updateAndGetData(actionType, item)),
+  changeActiveCategory: (name) => dispatch(actions.changeActiveCategory(name)),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(Cart);
