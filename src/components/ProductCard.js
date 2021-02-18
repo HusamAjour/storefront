@@ -1,7 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-// import { add, remove, reset } from '../store/cart.js';
-import * as actions from '../store/actions';
+import { NavLink } from 'react-router-dom';
+import {
+  get,
+  changeActiveCategory,
+  changeActiveProduct,
+  fetchData,
+} from '../rtk-store/data.store';
+import { add, remove } from '../rtk-store/cart.store';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -9,6 +15,8 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+// import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 import Show from './Show';
 const useStyles = makeStyles({
   textAlignLeft: {
@@ -70,11 +78,8 @@ function ProductCard(props) {
           <Button
             size="small"
             color="primary"
-            // onClick={() => {
-            //   props.add(props.wholeProduct);
-            // }}
-            onClick={async() => {
-              await props.update('ADD', props.wholeProduct);
+            onClick={() => {
+              props.add(props.wholeProduct);
             }}
           >
             ADD TO CART
@@ -84,18 +89,22 @@ function ProductCard(props) {
           <Button
             size="small"
             color="primary"
-            // onClick={() => {
-            //   props.add(props.wholeProduct);
-            // }}
-            onClick={async() => {
-              await props.update('REMOVE', props.wholeProduct);
+            onClick={() => {
+              props.remove(props.wholeProduct);
             }}
+
           >
             REMOVE FROM CART
           </Button>
         </Show>
-        <Button size="small" color="primary">
-          VIEW DETAILS
+        <Button
+          size="small"
+          color="primary"
+          onClick={() => props.changeActiveProduct(props.wholeProduct._id)}
+        >
+          <NavLink to={`/products/${props.wholeProduct._id}`}>
+            VIEW DETAILS
+          </NavLink>
         </Button>
       </CardActions>
     </Card>
@@ -103,11 +112,17 @@ function ProductCard(props) {
 }
 
 const mapStateToProps = (state) => ({
+  dataProps: state.data,
   cartItems: state.cart,
 });
 
-const mapDispatchToProps = (dispatch, getState) => ({
-  update: (actionType, item) => dispatch(actions.updateAndGetData(actionType, item)),
-});
+const mapDispatchToProps = {
+  get,
+  changeActiveCategory,
+  changeActiveProduct,
+  fetchData,
+  remove,
+  add,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductCard);

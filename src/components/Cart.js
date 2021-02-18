@@ -1,13 +1,17 @@
 import React from 'react';
 import Show from './Show';
-import * as actions from '../store/actions';
+import {
+  get,
+  changeActiveCategory,
+  changeActiveProduct,
+  fetchData,
+} from '../rtk-store/data.store';
+import { add, remove } from '../rtk-store/cart.store';
 import { Dropdown } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import { Badge, Button, ButtonGroup } from '@material-ui/core';
-// import { add, remove, reset } from '../store/cart.js';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
-import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 import RemoveIcon from '@material-ui/icons/Remove';
 import AddIcon from '@material-ui/icons/Add';
 
@@ -33,7 +37,7 @@ function Cart(props) {
     <div>
       <Dropdown>
         <Dropdown.Toggle variant="Primary" id="dropdown-basic">
-          <Badge badgeContent={props.cartItems.total} color="error">
+          <Badge badgeContent={props.cartItems.totalItems} color="error">
             <ShoppingCartIcon />
           </Badge>
         </Dropdown.Toggle>
@@ -42,7 +46,7 @@ function Cart(props) {
           {props.cartItems.items.map((item, idx) => {
             return (
               <Dropdown.ItemText className={classes.dropdownItem}>
-                <Badge badgeContent={item.quantity} color="primary">
+                <Badge badgeContent={item.count} color="primary">
                   {item.product.display_name}
                 </Badge>
                 <ButtonGroup className={classes.btnGroup}>
@@ -50,8 +54,7 @@ function Cart(props) {
                     className={classes.btn}
                     aria-label="reduce"
                     onClick={async () => {
-                      // props.remove(item.product);
-                      await props.update('REMOVE',item.product);
+                      props.remove(item.product);
                     }}
                   >
                     <RemoveIcon fontSize="small" />
@@ -59,9 +62,8 @@ function Cart(props) {
                   <Button
                     className={classes.btn}
                     aria-label="increase"
-                    onClick={async() => {
-                      // props.add(item.name);
-                      await props.update('ADD', item.product);
+                    onClick={async () => {
+                      props.add(item.product);
                     }}
                   >
                     <AddIcon fontSize="small" />
@@ -84,15 +86,17 @@ function Cart(props) {
 }
 
 const mapStateToProps = (state) => ({
-  cartItems: state.cart,
   dataProps: state.data,
+  cartItems: state.cart,
 });
 
-const mapDispatchToProps = (dispatch, getState) => ({
-  // add: (item)=> dispatch(actions.add(item)),
-  // remove: (item)=> dispatch(actions.remove(item)),
-  update: (actionType, item) => dispatch(actions.updateAndGetData(actionType, item)),
-  changeActiveCategory: (name) => dispatch(actions.changeActiveCategory(name)),
-});
+const mapDispatchToProps = {
+  get,
+  changeActiveCategory,
+  changeActiveProduct,
+  fetchData,
+  remove,
+  add,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Cart);

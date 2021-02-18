@@ -1,15 +1,18 @@
 import './App.scss';
-import Header from './components/Header'; 
-import Footer from './components/Footer'; 
+import Header from './components/Header';
+import Footer from './components/Footer';
 import CategoriesList from './components/CategoriesList.js';
+import { BrowserRouter } from 'react-router-dom';
 
 function App() {
   return (
     <div className="App">
       {console.log('Inside App')}
-      <Header />
-      <CategoriesList />
-      <Footer />
+      <BrowserRouter>
+        <Header />
+        <CategoriesList />
+        <Footer />
+      </BrowserRouter>
     </div>
   );
 }
